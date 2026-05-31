@@ -104,8 +104,8 @@ response2 = client.responses.parse(
     text_format=WeatherResponse,
 )
 
-logging.info("Final model response:")
-logger.info(response2.model_dump_json(indent=2))
+#logging.info("Final model response:")
+#logger.info(response2.model_dump_json(indent=2))
 logger.info("Final output text:")
 logger.info(response2.output_text)
 
