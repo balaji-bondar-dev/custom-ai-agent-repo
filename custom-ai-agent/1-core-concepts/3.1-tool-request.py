@@ -14,7 +14,6 @@ logger.info("Process started")
 client = OpenAI()
 logger.info("OpenAI client initialized")
 
-
 # 1. Define the actual function which will return the response
 def get_weather(location, units="c"):
     """This is the local python code that fetches real data."""
