@@ -42,7 +42,7 @@ print(response.output_text)
 response = client.responses.create(
     model="gpt-5",
     prompt={
-        "id": "pmpt_abc123",
+        "id": "example-prompt",
         "version": "2",
         "variables": {
             "customer_name": "Jane Doe",
