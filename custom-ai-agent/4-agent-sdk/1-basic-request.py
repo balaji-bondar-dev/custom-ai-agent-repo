@@ -1,7 +1,8 @@
 import asyncio
-from agents import Agent, Runner
+from openai import OpenAI
+from agents import Agent, Runner,function_tool
 
-#Agents are defined with instructions, a name, and optional configuration such as a specific model.
+# Agents are defined with instructions, a name, and optional configuration such as a specific model.
 agent = Agent(
     name="History Tutor",
     instructions="You answer history questions clearly and concisely.",
