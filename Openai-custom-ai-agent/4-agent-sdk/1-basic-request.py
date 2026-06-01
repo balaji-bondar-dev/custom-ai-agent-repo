@@ -31,6 +31,7 @@ async def main():
         agent,
         "Tell me something surprising about ancient life on Earth.",
     )
+    print("Final Output")
     print(result.final_output)
 
 await main ()
