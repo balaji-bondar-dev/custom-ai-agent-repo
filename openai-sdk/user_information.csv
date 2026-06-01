@@ -1,0 +1,11 @@
+UserID,FirstName,LastName,Email,Department,JoinDate
+1001,Alice,Smith,user1001@example.com,HR,2023-01-15
+1002,Bob,Johnson,user1002@example.com,IT,2022-11-02
+1003,Charlie,Williams,user1003@example.com,Sales,2024-02-10
+1004,David,Brown,user1004@example.com,IT,2023-05-20
+1005,Eve,Jones,user1005@example.com,Marketing,2023-08-12
+1006,Frank,Garcia,user1006@example.com,HR,2022-12-05
+1007,Grace,Miller,user1007@example.com,Sales,2024-01-20
+1008,Hannah,Davis,user1008@example.com,Marketing,2023-09-15
+1009,Ivy,Rodriguez,user1009@example.com,IT,2023-03-30
+1010,Jack,Martinez,user1010@example.com,Sales,2024-04-01
