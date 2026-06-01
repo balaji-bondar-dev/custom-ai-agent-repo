@@ -20,7 +20,7 @@ def get_weather(location, units="c"):
     # Replace this with a real API call to a weather service if needed
     return json.dumps({"location": location, "temperature": "22", "units": "celsius"})
 
-# 1. Define a list of callable tools for the model
+# 2. Define a list of callable tools for the model
 tools = [
     {
         "type": "function",
@@ -46,50 +46,63 @@ tools = [
     },
 ]
 
-# Prompt to be passed for the first time
-input_list = [
-    {"role": "user", "content": "What is the weather of Paris today?"}
-]
-
-# 2. Prompt the model with tools defined
-response = client.responses.create(
-    model="gpt-5",
+# 3. Streaming function call 
+stream = client.responses.create(
+    model="gpt-4.1",
+    input=[{"role": "user", "content": "What's the weather like in Paris today?"}],
     tools=tools,
-    input=input_list,
+    stream=True
 )
 
-logging.info("First model response:")
-logging.info(response.model_dump_json(indent=2))
+print("stream output")
+print(stream)
 
-# Save function call outputs for subsequent requests
-input_list += response.output
-print("Input list after first response:")
+input_list = []
+
+for event in stream:
+    #print(event.type)
+    # 1. Skip metadata events like ResponseCreatedEvent safely
+    if event.type == "response.created":
+        previous_response_id = event.response.id
+        continue 
+
+    # 2. Extract streaming text as it generates
+    elif event.type == "response.text.delta":
+        print(event.delta, end="", flush=True)
+
+    # 3. Detect when the model requests a function call 
+    elif event.type == "response.output_item.done":
+        print(event.item)
+        item = event.item
+        
+        if item.type == "function_call":
+            input_list.append(item)    
+
+print("Updated input_list")
 print(input_list)
+
 
 def call_function(name, args):
     if name == "get_weather":
         return get_weather(**args)
 
-for tool_call in response.output:
-    if tool_call.type != "function_call":
-        continue
+print("previous_response_id " + previous_response_id)
 
-    name = tool_call.name
-    args = json.loads(tool_call.arguments)
-    print(name)
-    print(args)
-
-    result = call_function(name, args)
-    input_list.append({
-        "type": "function_call_output",
-        "call_id": tool_call.call_id,
-        "output": str(result)
-    })
-    
-logging.info("Input list after processing function calls:")
-logger.info(input_list)
-
-# efine the desired output structure
+# After the stream ends, execute any requested weather lookups
+for tool_call in input_list:
+    if tool_call.name == "get_weather":
+        name = tool_call.name
+        args = json.loads(tool_call.arguments)
+        result = call_function(name, args)
+        print(f"\nExecuting get_weather for {args['location']}...")
+        
+        input_list.append({
+            "type": "function_call_output",
+            "call_id": tool_call.call_id,
+            "output": str(result)
+        }) 
+        
+# 4. Define the desired output structure
 class WeatherResponse(BaseModel):
     location: str = Field(description="The city and state/country being queried")
     temperature: float = Field(description="The current temperature in Celsius")
@@ -103,12 +116,7 @@ response2 = client.responses.parse(
     text_format=WeatherResponse,
 )
 
-#logging.info("Final model response:")
-#logger.info(response2.model_dump_json(indent=2))
-logger.info("Final output text:")
-logger.info(response2.output_text)
-
 # 5. The model should be able to give a response!
-#print("Final output:")
-#print(response.model_dump_json(indent=2))
-#print("\n" + response.output_text)
+print("Final output:")
+print(response2.model_dump_json(indent=2))
+print("\n" + response2.output_text)
